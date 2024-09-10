@@ -2,139 +2,127 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>EmulatorJS Demo</title>
     <link rel="icon" href="docs/favicon.ico" sizes="16x16 32x32 48x48 64x64" type="image/vnd.microsoft.icon">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         body, html {
             height: 100%;
+            background-color: black;
+            color: white;
+        }
+
+        body {
             margin: 0;
-            font-family: 'Press Start 2P', cursive; /* Fuente retro */
-            background-color: #121212; /* Color de fondo */
-            color: #fff; /* Color de texto */
+            overflow: hidden;
         }
 
-        /* Estilos del spinner */
-        #spinner {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            border: 16px solid #fff; /* Borde blanco */
-            border-top: 16px solid #ffcc00; /* Color amarillo */
-            border-radius: 50%;
-            width: 120px;
-            height: 120px;
-            animation: spin 1.5s linear infinite;
-            z-index: 1000; /* Asegurar que el spinner esté encima */
-            display: none; /* Oculto por defecto */
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Estilos del menú de navegación */
-        nav {
+        body, #box, #top {
             display: flex;
-            justify-content: center;
-            margin: 10px 0;
-        }
-
-        nav a {
-            padding: 10px 20px;
-            margin: 0 5px;
-            background-color: #8e44ad; /* Morado */
-            color: #2ecc71; /* Texto verde */
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s, box-shadow 0.3s;
-        }
-
-        nav a:hover {
-            background-color: #2ecc71; /* Verde */
-            box-shadow: 0 0 10px #8e44ad; /* Resplandor morado */
-        }
-
-        /* Estilos del cuadro de búsqueda */
-        #search {
-            display: flex;
-            justify-content: center;
-            margin: 20px 0;
-        }
-
-        #search input {
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #2ecc71; /* Borde verde */
-            width: 200px;
-            margin-right: 10px;
-            background-color: #2c3e50; /* Fondo más oscuro */
-            color: #fff;
-        }
-
-        /* Estilos del botón */
-        #load-button {
-            padding: 10px 20px;
-            background-color: #2ecc71; /* Verde */
-            color: #8e44ad; /* Texto morado */
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: box-shadow 0.3s;
-        }
-
-        #load-button:hover {
-            box-shadow: 0 0 10px #8e44ad; /* Resplandor morado */
-        }
-
-        /* Estilos del cuadro de contenido */
-        #box {
-            display: flex;
-            flex-direction: column;
             align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        #box {
+            color: #aaa;
+            height: 20em;
+            width: 30em;
+            max-width: 80%;
+            max-height: 80%;
+            background-color: #333;
+            border-radius: 0.4em;
+            border: 2px solid #555;
+            position: relative;
+            flex-direction: column;
+            transition-duration: 0.2s;
+            overflow: hidden;
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 20px;
+            margin: 5px;
+        }
+
+        #box:hover, #box[drag] {
+            border-color: #38f;
+            color: #ddd;
+        }
+
+        #input {
+            cursor: pointer;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+        }
+
+        #display {
+            width: 100%;
+            height: 100%;
+        }
+
+        select, button, input[type="text"] {
+            padding: 0.6em 0.4em;
+            margin: 0.5em;
+            width: 15em;
+            max-width: 100%;
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 16px;
+            background-color: #444;
+            color: #aaa;
+            border-radius: 0.4em;
+            border: 1px solid #555;
+            cursor: pointer;
+            transition-duration: 0.2s;
+        }
+
+        select:hover, button:hover {
+            background-color: #666;
+            color: #ddd;
+        }
+
+        input[type="text"]:hover {
+            background-color: #666;
+            color: #ddd;
         }
 
         .logo {
             width: 130px;
             height: 130px;
-            filter: drop-shadow(0 0 10px #fff);
+            filter: drop-shadow(0 0 10px white);
         }
 
         #top {
-            text-align: center;
+            margin: 5px;
         }
 
-        #input {
-            display: none; /* Oculto por defecto */
+        #searchBox {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        #searchInput {
+            margin-right: 0.5em;
         }
     </style>
 </head>
 
 <body>
-    <div id="spinner"></div>
-
     <div id="top">
-        <h1>Emulador Popular</h1>
-        <img src="https://i.ibb.co/BqbGpLn/pngwing-com.png" alt="Logo" class="logo">
+        <h1>EmulatorJS Demo</h1>
+        <img src="docs/Logo-light.png" alt="Logo" class="logo">
     </div>
-
-    <nav>
-        <a href="#">Inicio</a>
-        <a href="https://www.retrostic.com/es/roms" target="_blank">Juegos</a>
-        <a href="#">Contacto</a>
-    </nav>
-
-    <div id="search">
-        <input type="text" id="search-input" placeholder="Buscar ROMs...">
-        <button id="load-button">Cargar ROM</button>
-    </div>
-
     <div id="box">
         <input type="file" id="input">
-        <p>Pesca la ROM y chantala aquí mano!</p>
+        Drag ROM file or click here
+        <div id="searchBox">
+            <input type="text" id="searchInput" placeholder="Buscar juego...">
+            <button id="searchButton">Buscar</button>
+        </div>
     </div>
 
     <script>
@@ -142,7 +130,6 @@
         let enableThreads = false;
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
-        
         if (urlParams.get('debug') == 1) {
             enableDebug = true;
             console.log("Debug is enabled");
@@ -155,56 +142,47 @@
                 enableThreads = true;
                 console.log("Threads are enabled");
             } else {
-                console.warn("Threads are disabled as SharedArrayBuffer is not available. Threads requires two headers to be set when sending your HTML page.");
+                console.warn("Threads are disabled as SharedArrayBuffer is not available. Threads requires two headers to be set when sending you html page. See https://stackoverflow.com/a/68630724");
+                console.log("Threads are disabled");
             }
         } else {
             console.log("Threads are disabled");
         }
 
-        const spinner = document.getElementById('spinner');
-        const input = document.getElementById('input');
-
-        document.getElementById('load-button').onclick = () => {
-            input.click(); // Disparar el input de archivo
-        };
-
         input.onchange = async () => {
-            spinner.style.display = 'block'; // Mostrar el spinner
-            const file = input.files[0];
-            const parts = file.name.split(".");
+            const url = input.files[0];
+            const parts = input.files[0].name.split(".");
 
             const core = await (async (ext) => {
-                // Determinar el tipo de núcleo según la extensión del archivo
-                const coreMap = {
-                    "fds": "nes",
-                    "nes": "nes",
-                    "unif": "nes",
-                    "unf": "nes",
-                    "smc": "snes",
-                    "fig": "snes",
-                    "sfc": "snes",
-                    "gd3": "snes",
-                    "gd7": "snes",
-                    "dx2": "snes",
-                    "bsx": "snes",
-                    "swc": "snes",
-                    "z64": "n64",
-                    "n64": "n64",
-                    "pce": "pce",
-                    "ngp": "ngp",
-                    "ngc": "ngp",
-                    "ws": "ws",
-                    "wsc": "ws",
-                    "col": "coleco",
-                    "cv": "coleco",
-                    "d64": "vice_x64sc",
-                    "nds": "nds",
-                    "gba": "gba",
-                    "gb": "gb"
-                };
+                if (["fds", "nes", "unif", "unf"].includes(ext))
+                    return "nes";
 
-                return coreMap[ext] || await new Promise(resolve => {
-                    const coreValues = {
+                if (["smc", "fig", "sfc", "gd3", "gd7", "dx2", "bsx", "swc"].includes(ext))
+                    return "snes";
+
+                if (["z64", "n64"].includes(ext))
+                    return "n64";
+
+                if (["pce"].includes(ext))
+                    return "pce";
+
+                if (["ngp", "ngc"].includes(ext))
+                    return "ngp";
+
+                if (["ws", "wsc"].includes(ext))
+                    return "ws";
+
+                if (["col", "cv"].includes(ext))
+                    return "coleco";
+
+                if (["d64"].includes(ext))
+                    return "vice_x64sc";
+
+                if (["nds", "gba", "gb", "z64", "n64"].includes(ext))
+                    return ext;
+
+                return await new Promise(resolve => {
+                    var coreValues = {
                         "Nintendo 64": "n64",
                         "Nintendo Game Boy": "gb",
                         "Nintendo Game Boy Advance": "gba",
@@ -228,53 +206,136 @@
                         "SNK NeoGeo Pocket (Color)": "ngp",
                         "Bandai WonderSwan (Color)": "ws",
                         "ColecoVision": "coleco",
-                        "Commodore 64": "vice_x64sc"
-                    };
+                        "Commodore 64": "vice_x64sc",
+                        "Commodore 128": "vice_x128",
+                        "Commodore VIC20": "vice_xvic",
+                        "Commodore Plus/4": "vice_xplus4",
+                        "Commodore PET": "vice_xpet"
+                    }
 
+                    const cores = Object.keys(coreValues).sort().reduce(
+                        (obj, key) => {
+                            obj[key] = coreValues[key];
+                            return obj;
+                        },
+                        {}
+                    );
+
+                    const button = document.createElement("button");
                     const select = document.createElement("select");
 
-                    for (const type in coreValues) {
+                    for (const type in cores) {
                         const option = document.createElement("option");
-                        option.value = coreValues[type];
-                        option.text = type;
+                        option.value = cores[type];
+                        option.textContent = type;
                         select.appendChild(option);
                     }
 
-                    const button = document.createElement("button");
-                    button.textContent = "Seleccionar Núcleo";
-                    button.onclick = () => {
-                        const selectedCore = select.value;
-                        resolve(selectedCore);
-                        document.body.removeChild(select);
-                        document.body.removeChild(button);
-                    };
+                    button.onclick = () => resolve(select[select.selectedIndex].value);
+                    button.textContent = "Load game";
+                    box.innerHTML = "";
 
-                    document.body.appendChild(select);
-                    document.body.appendChild(button);
+                    box.appendChild(select);
+                    box.appendChild(button);
                 });
-            })(parts[parts.length - 1].toLowerCase());
+            })(parts.pop());
 
-            console.log("Núcleo seleccionado:", core);
-            const arrayBuffer = await file.arrayBuffer();
+            const div = document.createElement("div");
+            const sub = document.createElement("div");
+            const script = document.createElement("script");
 
-            // Inicializar el emulador con el núcleo seleccionado y la ROM
+            sub.id = "game";
+            div.id = "display";
 
-// Inicializar el emulador con el núcleo seleccionado y la ROM
-            const emulator = new Emulator(core, arrayBuffer, {
-                enableDebug,
-                enableThreads
-            });
+            const top = document.getElementById("top");
+            top.remove();
+            box.remove();
+            div.appendChild(sub);
+            document.body.appendChild(div);
 
-            // Comenzar la emulación
-            try {
-                await emulator.run();
-            } catch (error) {
-                console.error("Error durante la ejecución del emulador:", error);
-                alert("Hubo un error al cargar la ROM. Asegúrate de que el archivo sea compatible.");
-            } finally {
-                spinner.style.display = 'none'; // Ocultar el spinner después de cargar
+            window.EJS_player = "#game";
+            window.EJS_gameName = parts.shift();
+            window.EJS_biosUrl = "";
+            window.EJS_gameUrl = url;
+            window.EJS_core = core;
+            window.EJS_pathtodata = "data/";
+            window.EJS_startOnLoaded = true;
+            window.EJS_DEBUG_XX = enableDebug;
+            window.EJS_disableDatabases = true;
+            window.EJS_threads = enableThreads;
+
+            script.src = "data/loader.js";
+            document.body.appendChild(script);
+        }
+
+        box.ondragover = () => box.setAttribute("drag", true);
+        box.ondragleave = () => box.removeAttribute("drag");
+
+        // Implementación de la búsqueda de juegos
+        document.getElementById('searchButton').onclick = () => {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            // Aquí deberías implementar la lógica para filtrar los juegos
+            console.log("Buscar juego:", query);
+            // Ejemplo de filtrado (reemplazar con la lógica real)
+            //
+// Ejemplo de juegos (deberías reemplazar esto con la lista real de juegos)
+            const juegosDisponibles = [
+                "Super Mario Bros",
+                "The Legend of Zelda",
+                "Metroid",
+                "Donkey Kong",
+                "Sonic the Hedgehog",
+                "Street Fighter II",
+                "Final Fantasy VII",
+                "Mario Kart 64",
+                "Tetris",
+                "Castlevania",
+                // Añade más juegos aquí
+            ];
+
+            // Función para filtrar y mostrar los juegos
+            const mostrarJuegosFiltrados = (query) => {
+                const resultadosDiv = document.getElementById('resultados');
+                resultadosDiv.innerHTML = ""; // Limpiar resultados anteriores
+
+                const resultados = juegosDisponibles.filter(juego => juego.toLowerCase().includes(query));
+                
+                if (resultados.length > 0) {
+                    resultados.forEach(juego => {
+                        const juegoDiv = document.createElement('div');
+                        juegoDiv.textContent = juego;
+                        juegoDiv.style.cursor = 'pointer';
+                        juegoDiv.onclick = () => {
+                            // Aquí puedes agregar la lógica para cargar el juego seleccionado
+                            console.log("Cargando juego:", juego);
+                        };
+                        resultadosDiv.appendChild(juegoDiv);
+                    });
+                } else {
+                    resultadosDiv.textContent = "No se encontraron juegos.";
+                }
             }
-        };
+
+            // Al hacer clic en el botón de búsqueda
+            document.getElementById('searchButton').onclick = () => {
+                const query = document.getElementById('searchInput').value.toLowerCase();
+                mostrarJuegosFiltrados(query);
+            }
+
+            // Crear un contenedor para mostrar los resultados de búsqueda
+            const resultadosDiv = document.createElement('div');
+            resultadosDiv.id = 'resultados';
+            resultadosDiv.style.width = '30em';
+            resultadosDiv.style.maxWidth = '80%';
+            resultadosDiv.style.backgroundColor = '#444';
+            resultadosDiv.style.borderRadius = '0.4em';
+            resultadosDiv.style.padding = '1em';
+            resultadosDiv.style.marginTop = '1em';
+            resultadosDiv.style.overflowY = 'auto';
+            resultadosDiv.style.maxHeight = '200px'; // Limitar la altura de los resultados
+
+            box.appendChild(resultadosDiv);
+        }
     </script>
 </body>
 </html>

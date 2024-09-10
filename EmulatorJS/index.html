@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emulador Poblacional</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
     <style>
         body, html {
             margin: 0;
@@ -86,6 +87,7 @@
             background: rgba(0, 0, 0, 0.8);
             color: white;
             font-size: 2em;
+            display: flex;
             align-items: center;
             justify-content: center;
             z-index: 1000;
@@ -157,7 +159,7 @@
                         core: core
                     }, "game");
                 };
-                
+
                 gameContainer.innerHTML = '';
                 gameContainer.appendChild(script);
             };

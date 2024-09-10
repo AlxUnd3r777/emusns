@@ -1,341 +1,255 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>EmulatorJS Demo</title>
-    <link rel="icon" href="docs/favicon.ico" sizes="16x16 32x32 48x48 64x64" type="image/vnd.microsoft.icon">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        body, html {
-            height: 100%;
-            background-color: black;
-            color: white;
-        }
+<html>
+    <head>
+        <title>EmulatorJS Demo</title>
+        <link rel = icon href = docs/favicon.ico sizes = "16x16 32x32 48x48 64x64" type = image/vnd.microsoft.icon>
+        <meta name = viewport content = "width = device-width, initial-scale = 1">
+        <style>
+             body, html {
+                height: 100%;
+                background-color: black;
+                color: white;
+            }
 
-        body {
-            margin: 0;
-            overflow: hidden;
-        }
+            body {
+                margin: 0;
+                overflow: hidden;
+            }
 
-        body, #box, #top {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
+            body, #box, #top {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-direction: column;
+            }
 
-        #box {
-            color: #aaa;
-            height: 20em;
-            width: 30em;
-            max-width: 80%;
-            max-height: 80%;
-            background-color: #333;
-            border-radius: 0.4em;
-            border: 2px solid #555;
-            position: relative;
-            flex-direction: column;
-            transition-duration: 0.2s;
-            overflow: hidden;
-            font-family: monospace;
-            font-weight: bold;
-            font-size: 20px;
-            margin: 5px;
-        }
+            #box {
+                color: #aaa;
+                height: 20em;
+                width: 30em;
+                max-width: 80%;
+                max-height: 80%;
+                background-color: #333;
+                border-radius: 0.4em;
+                border: 2px solid #555;
+                position: relative;
+                flex-direction: column;
+                transition-duration: 0.2s;
+                overflow: hidden;
+                font-family: monospace;
+                font-weight: bold;
+                font-size: 20px;
+                margin: 5px;
+            }
 
-        #box:hover, #box[drag] {
-            border-color: #38f;
-            color: #ddd;
-        }
+            #box:hover, #box[drag] {
+                border-color: #38f;
+                color: #ddd
+            }
 
-        #input {
-            cursor: pointer;
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-        }
+            #input {
+                cursor: pointer;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                opacity: 0
+            }
 
-        #display {
-            width: 100%;
-            height: 100%;
-        }
+            #display {
+                width: 100%;
+                height: 100%
+            }
 
-        select, button, input[type="text"] {
-            padding: 0.6em 0.4em;
-            margin: 0.5em;
-            width: 15em;
-            max-width: 100%;
-            font-family: monospace;
-            font-weight: bold;
-            font-size: 16px;
-            background-color: #444;
-            color: #aaa;
-            border-radius: 0.4em;
-            border: 1px solid #555;
-            cursor: pointer;
-            transition-duration: 0.2s;
-        }
+            select, button {
+                padding: 0.6em 0.4em;
+                margin: 0.5em;
+                width: 15em;
+                max-width: 100%;
+                font-family: monospace;
+                font-weight: bold;
+                font-size: 16px;
+                background-color: #444;
+                color: #aaa;
+                border-radius: 0.4em;
+                border: 1px solid #555;
+                cursor: pointer;
+                transition-duration: 0.2s
+            }
 
-        select:hover, button:hover {
-            background-color: #666;
-            color: #ddd;
-        }
+            select:hover, button:hover {
+                background-color: #666;
+                color: #ddd
+            }
 
-        input[type="text"]:hover {
-            background-color: #666;
-            color: #ddd;
-        }
+            .logo {
+                width: 130px;
+                height: 130px;
+                filter: drop-shadow(0 0 10px white);
+            }
 
-        .logo {
-            width: 130px;
-            height: 130px;
-            filter: drop-shadow(0 0 10px white);
-        }
+            #top {
+                margin: 5px;
+            }
+        </style>
+    </head>
 
-        #top {
-            margin: 5px;
-        }
-
-        #searchBox {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-        }
-
-        #searchInput {
-            margin-right: 0.5em;
-        }
-    </style>
-</head>
-
-<body>
-    <div id="top">
-        <h1>EmulatorJS Demo</h1>
-        <img src="docs/Logo-light.png" alt="Logo" class="logo">
-    </div>
-    <div id="box">
-        <input type="file" id="input">
-        Drag ROM file or click here
-        <div id="searchBox">
-            <input type="text" id="searchInput" placeholder="Buscar juego...">
-            <button id="searchButton">Buscar</button>
+    <body>
+        <div id="top">
+            <h1>EmulatorJS Demo</h1>
+            <img src="docs/Logo-light.png" alt="Logo" class="logo">
         </div>
-    </div>
+        <div id = box>
+            <input type = file id = input>
+            Drag ROM file or click here
+        </div>
 
-    <script>
-        let enableDebug = false;
-        let enableThreads = false;
-        const queryString = window.location.search;
-        const urlParams = new URLSearchParams(queryString);
-        if (urlParams.get('debug') == 1) {
-            enableDebug = true;
-            console.log("Debug is enabled");
-        } else {
-            console.log("Debug is disabled");
-        }
-
-        if (urlParams.get('threads') == 1) {
-            if (window.SharedArrayBuffer) {
-                enableThreads = true;
-                console.log("Threads are enabled");
+        <script>
+            let enableDebug = false;
+            let enableThreads = false;
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            if (urlParams.get('debug') == 1) {
+                enableDebug = true;
+                console.log("Debug is enabled");
             } else {
-                console.warn("Threads are disabled as SharedArrayBuffer is not available. Threads requires two headers to be set when sending you html page. See https://stackoverflow.com/a/68630724");
+                console.log("Debug is disabled");
+            }
+
+            if (urlParams.get('threads') == 1) {
+                if (window.SharedArrayBuffer) {
+                    enableThreads = true;
+                    console.log("Threads are enabled");
+                } else {
+                    console.warn("Threads are disabled as SharedArrayBuffer is not available. Threads requires two headers to be set when sending you html page. See https://stackoverflow.com/a/68630724");
+                    console.log("Threads are disabled");
+                }
+            } else {
                 console.log("Threads are disabled");
             }
-        } else {
-            console.log("Threads are disabled");
-        }
 
-        input.onchange = async () => {
-            const url = input.files[0];
-            const parts = input.files[0].name.split(".");
+            input.onchange = async () => {
+                const url = input.files[0]
+                const parts = input.files[0].name.split(".")
 
-            const core = await (async (ext) => {
-                if (["fds", "nes", "unif", "unf"].includes(ext))
-                    return "nes";
+                const core = await (async (ext) => {
+                    if (["fds", "nes", "unif", "unf"].includes(ext))
+                        return "nes"
 
-                if (["smc", "fig", "sfc", "gd3", "gd7", "dx2", "bsx", "swc"].includes(ext))
-                    return "snes";
+                    if (["smc", "fig", "sfc", "gd3", "gd7", "dx2", "bsx", "swc"].includes(ext))
+                        return "snes"
 
-                if (["z64", "n64"].includes(ext))
-                    return "n64";
+                    if (["z64", "n64"].includes(ext))
+                        return "n64"
 
-                if (["pce"].includes(ext))
-                    return "pce";
+                    if (["pce"].includes(ext))
+                        return "pce"
 
-                if (["ngp", "ngc"].includes(ext))
-                    return "ngp";
+                    if (["ngp", "ngc"].includes(ext))
+                        return "ngp"
 
-                if (["ws", "wsc"].includes(ext))
-                    return "ws";
+                    if (["ws", "wsc"].includes(ext))
+                        return "ws"
 
-                if (["col", "cv"].includes(ext))
-                    return "coleco";
+                    if (["col", "cv"].includes(ext))
+                        return "coleco"
 
-                if (["d64"].includes(ext))
-                    return "vice_x64sc";
+                    if (["d64"].includes(ext))
+                        return "vice_x64sc"
 
-                if (["nds", "gba", "gb", "z64", "n64"].includes(ext))
-                    return ext;
+                    if (["nds", "gba", "gb", "z64", "n64"].includes(ext))
+                        return ext
 
-                return await new Promise(resolve => {
-                    var coreValues = {
-                        "Nintendo 64": "n64",
-                        "Nintendo Game Boy": "gb",
-                        "Nintendo Game Boy Advance": "gba",
-                        "Nintendo DS": "nds",
-                        "Nintendo Entertainment System": "nes",
-                        "Super Nintendo Entertainment System": "snes",
-                        "PlayStation": "psx",
-                        "Virtual Boy": "vb",
-                        "Sega Mega Drive": "segaMD",
-                        "Sega Master System": "segaMS",
-                        "Sega CD": "segaCD",
-                        "Atari Lynx": "lynx",
-                        "Sega 32X": "sega32x",
-                        "Atari Jaguar": "jaguar",
-                        "Sega Game Gear": "segaGG",
-                        "Sega Saturn": "segaSaturn",
-                        "Atari 7800": "atari7800",
-                        "Atari 2600": "atari2600",
-                        "NEC TurboGrafx-16/SuperGrafx/PC Engine": "pce",
-                        "NEC PC-FX": "pcfx",
-                        "SNK NeoGeo Pocket (Color)": "ngp",
-                        "Bandai WonderSwan (Color)": "ws",
-                        "ColecoVision": "coleco",
-                        "Commodore 64": "vice_x64sc",
-                        "Commodore 128": "vice_x128",
-                        "Commodore VIC20": "vice_xvic",
-                        "Commodore Plus/4": "vice_xplus4",
-                        "Commodore PET": "vice_xpet"
-                    }
+                    return await new Promise(resolve => {
+                        var coreValues = {
+                            "Nintendo 64": "n64",
+                            "Nintendo Game Boy": "gb",
+                            "Nintendo Game Boy Advance": "gba",
+                            "Nintendo DS": "nds",
+                            "Nintendo Entertainment System": "nes",
+                            "Super Nintendo Entertainment System": "snes",
+                            "PlayStation": "psx",
+                            "Virtual Boy": "vb",
+                            "Sega Mega Drive": "segaMD",
+                            "Sega Master System": "segaMS",
+                            "Sega CD": "segaCD",
+                            "Atari Lynx": "lynx",
+                            "Sega 32X": "sega32x",
+                            "Atari Jaguar": "jaguar",
+                            "Sega Game Gear": "segaGG",
+                            "Sega Saturn": "segaSaturn",
+                            "Atari 7800": "atari7800",
+                            "Atari 2600": "atari2600",
+                            "NEC TurboGrafx-16/SuperGrafx/PC Engine": "pce",
+                            "NEC PC-FX": "pcfx",
+                            "SNK NeoGeo Pocket (Color)": "ngp",
+                            "Bandai WonderSwan (Color)": "ws",
+                            "ColecoVision": "coleco",
+                            "Commodore 64": "vice_x64sc",
+                            "Commodore 128": "vice_x128",
+                            "Commodore VIC20": "vice_xvic",
+                            "Commodore Plus/4": "vice_xplus4",
+                            "Commodore PET": "vice_xpet"
+                        }
 
-                    const cores = Object.keys(coreValues).sort().reduce(
-                        (obj, key) => {
-                            obj[key] = coreValues[key];
-                            return obj;
-                        },
-                        {}
-                    );
+                        const cores = Object.keys(coreValues).sort().reduce(
+                            (obj, key) => { 
+                                obj[key] = coreValues[key]; 
+                                return obj;
+                            }, 
+                            {}
+                        );
 
-                    const button = document.createElement("button");
-                    const select = document.createElement("select");
+                        const button = document.createElement("button")
+                        const select = document.createElement("select")
 
-                    for (const type in cores) {
-                        const option = document.createElement("option");
-                        option.value = cores[type];
-                        option.textContent = type;
-                        select.appendChild(option);
-                    }
+                        for (const type in cores) {
+                            const option = document.createElement("option")
 
-                    button.onclick = () => resolve(select[select.selectedIndex].value);
-                    button.textContent = "Load game";
-                    box.innerHTML = "";
+                            option.value = cores[type]
+                            option.textContent = type
+                            select.appendChild(option)
+                        }
 
-                    box.appendChild(select);
-                    box.appendChild(button);
-                });
-            })(parts.pop());
+                        button.onclick = () => resolve(select[select.selectedIndex].value)
+                        button.textContent = "Load game"
+                        box.innerHTML = ""
 
-            const div = document.createElement("div");
-            const sub = document.createElement("div");
-            const script = document.createElement("script");
+                        box.appendChild(select)
+                        box.appendChild(button)
+                    })
+                })(parts.pop())
 
-            sub.id = "game";
-            div.id = "display";
+                const div = document.createElement("div")
+                const sub = document.createElement("div")
+                const script = document.createElement("script")
 
-            const top = document.getElementById("top");
-            top.remove();
-            box.remove();
-            div.appendChild(sub);
-            document.body.appendChild(div);
+                sub.id = "game"
+                div.id = "display"
 
-            window.EJS_player = "#game";
-            window.EJS_gameName = parts.shift();
-            window.EJS_biosUrl = "";
-            window.EJS_gameUrl = url;
-            window.EJS_core = core;
-            window.EJS_pathtodata = "data/";
-            window.EJS_startOnLoaded = true;
-            window.EJS_DEBUG_XX = enableDebug;
-            window.EJS_disableDatabases = true;
-            window.EJS_threads = enableThreads;
+                const top = document.getElementById("top");
+                top.remove();
+                box.remove()
+                div.appendChild(sub)
+                document.body.appendChild(div)
 
-            script.src = "data/loader.js";
-            document.body.appendChild(script);
-        }
+                window.EJS_player = "#game";
+                window.EJS_gameName = parts.shift();
+                window.EJS_biosUrl = "";
+                window.EJS_gameUrl = url;
+                window.EJS_core = core;
+                window.EJS_pathtodata = "data/";
+                window.EJS_startOnLoaded = true;
+                window.EJS_DEBUG_XX = enableDebug;
+                window.EJS_disableDatabases = true;
+                window.EJS_threads = enableThreads;
 
-        box.ondragover = () => box.setAttribute("drag", true);
-        box.ondragleave = () => box.removeAttribute("drag");
-
-        // Implementación de la búsqueda de juegos
-        document.getElementById('searchButton').onclick = () => {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            // Aquí deberías implementar la lógica para filtrar los juegos
-            console.log("Buscar juego:", query);
-            // Ejemplo de filtrado (reemplazar con la lógica real)
-            //
-// Ejemplo de juegos (deberías reemplazar esto con la lista real de juegos)
-            const juegosDisponibles = [
-                "Super Mario Bros",
-                "The Legend of Zelda",
-                "Metroid",
-                "Donkey Kong",
-                "Sonic the Hedgehog",
-                "Street Fighter II",
-                "Final Fantasy VII",
-                "Mario Kart 64",
-                "Tetris",
-                "Castlevania",
-                // Añade más juegos aquí
-            ];
-
-            // Función para filtrar y mostrar los juegos
-            const mostrarJuegosFiltrados = (query) => {
-                const resultadosDiv = document.getElementById('resultados');
-                resultadosDiv.innerHTML = ""; // Limpiar resultados anteriores
-
-                const resultados = juegosDisponibles.filter(juego => juego.toLowerCase().includes(query));
-                
-                if (resultados.length > 0) {
-                    resultados.forEach(juego => {
-                        const juegoDiv = document.createElement('div');
-                        juegoDiv.textContent = juego;
-                        juegoDiv.style.cursor = 'pointer';
-                        juegoDiv.onclick = () => {
-                            // Aquí puedes agregar la lógica para cargar el juego seleccionado
-                            console.log("Cargando juego:", juego);
-                        };
-                        resultadosDiv.appendChild(juegoDiv);
-                    });
-                } else {
-                    resultadosDiv.textContent = "No se encontraron juegos.";
-                }
+                script.src = "data/loader.js";
+                document.body.appendChild(script);
             }
-
-            // Al hacer clic en el botón de búsqueda
-            document.getElementById('searchButton').onclick = () => {
-                const query = document.getElementById('searchInput').value.toLowerCase();
-                mostrarJuegosFiltrados(query);
-            }
-
-            // Crear un contenedor para mostrar los resultados de búsqueda
-            const resultadosDiv = document.createElement('div');
-            resultadosDiv.id = 'resultados';
-            resultadosDiv.style.width = '30em';
-            resultadosDiv.style.maxWidth = '80%';
-            resultadosDiv.style.backgroundColor = '#444';
-            resultadosDiv.style.borderRadius = '0.4em';
-            resultadosDiv.style.padding = '1em';
-            resultadosDiv.style.marginTop = '1em';
-            resultadosDiv.style.overflowY = 'auto';
-            resultadosDiv.style.maxHeight = '200px'; // Limitar la altura de los resultados
-
-            box.appendChild(resultadosDiv);
-        }
-    </script>
-</body>
+            box.ondragover = () => box.setAttribute("drag", true);
+            box.ondragleave = () => box.removeAttribute("drag");
+        </script>
+    </body>
 </html>

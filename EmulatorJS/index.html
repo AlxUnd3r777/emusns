@@ -220,55 +220,77 @@
             input.onchange = async () => {
                 showLoading(); // Mostrar el cuadro de carga
 
-                const url = input.files[0];
-                const parts = input.files[0].name.split(".");
-
-                const core = await (async (ext) => {
-                    if (["fds", "nes", "unif", "unf"].includes(ext)) return "nes";
-                    if (["smc", "fig", "sfc", "gd3", "gd7", "dx2", "bsx", "swc"].includes(ext)) return "snes";
-                    if (["z64", "n64"].includes(ext)) return "n64";
-                    if (["pce"].includes(ext)) return "pce";
-                    if (["ngp", "ngc"].includes(ext)) return "ngp";
-                    if (["ws", "wsc"].includes(ext)) return "ws";
-                    if (["col", "cv"].includes(ext)) return "coleco";
-                    if (["d64"].includes(ext)) return "vice_x64sc";
-                    if (["nds", "gba", "gb", "z64", "n64"].includes(ext)) return ext;
-                    return "nes";
-                })(parts.pop());
+                const file = input.files[0];
+                const parts = file.name.split(".");
+                const ext = parts.pop();
+                const coreMap = {
+                    "fds": "nes",
+                    "nes": "nes",
+                    "unif": "nes",
+                    "unf": "nes",
+                    "smc": "snes",
+                    "fig": "snes",
+                    "sfc": "snes",
+                    "gd3": "snes",
+                    "gd7": "snes",
+                    "dx2": "snes",
+                    "bsx": "snes",
+                    "swc": "snes",
+                    "z64": "n64",
+                    "n64": "n64",
+                    "pce": "pce",
+                    "ngp": "ngp",
+                    "ngc": "ngp",
+                    "ws": "ws",
+                    "wsc": "ws",
+                    "col": "coleco",
+                    "cv": "coleco",
+                    "d64": "vice_x64sc",
+                    "nds": "nds",
+                    "gba": "gba",
+                    "gb": "gb"
+                };
+                const core = coreMap[ext] || "nes";
 
                 const div = document.createElement("div");
                 const sub = document.createElement("div");
-                const script = document.createElement
                 const script = document.createElement("script");
+
                 div.id = "game-container";
                 sub.id = "game";
                 div.style.width = "100%";
-                div.style.height = "400px";
-                div.style.display = "flex";
-                div.style.justifyContent = "center";
-                div.style.backgroundColor = "#000";
-                document.getElementById('display').appendChild(div);
+                div.style.height = "
+
+                div.style.height = "100%";
+                div.style.position = "relative";
                 div.appendChild(sub);
+                document.getElementById('display').innerHTML = "";
+                document.getElementById('display').appendChild(div);
 
-                script.src = `https://cdn.jsdelivr.net/gh/EmulatorJS/EmulatorJS/dist/Embed.js`;
-                script.onload = async () => {
-                    const emu = new EJS(emulator => {
-                        emulator.addEventListener('loaded', () => {
-                            hideLoading(); // Ocultar el cuadro de carga una vez que el emulador esté listo
+                script.src = `https://cdn.jsdelivr.net/npm/@emulator/${core}/dist/${core}.js`;
+                script.onload = () => {
+                    // Inicializar el emulador después de cargar el script
+                    const game = document.createElement("script");
+                    game.src = URL.createObjectURL(new Blob([`
+                        const ${core} = new ${core}Engine({
+                            canvas: document.getElementById('game'),
+                            debug: ${enableDebug},
+                            threads: ${enableThreads},
                         });
-                    });
-
-                    emu.openFile({
-                        url: URL.createObjectURL(url),
-                        type: core,
-                        core: core
-                    }, "game");
+                        ${core}.loadROM('${URL.createObjectURL(file)}');
+                    `], { type: 'application/javascript' }));
+                    game.onload = () => hideLoading(); // Ocultar el cuadro de carga después de cargar el juego
+                    document.body.appendChild(game);
                 };
-
                 document.body.appendChild(script);
             };
-
             input.click();
+        });
+
+        // Manejador de búsqueda
+        document.getElementById('search-box').addEventListener('input', (event) => {
+            console.log(`Buscando ROM: ${event.target.value}`);
+            // Implementa la funcionalidad de búsqueda aquí si es necesario
         });
     </script>
 </body>

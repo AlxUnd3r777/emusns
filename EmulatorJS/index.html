@@ -6,266 +6,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <style>
-        #spinner {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            border: 16px solid #fff; /* White border */
-            border-top: 16px solid #ffcc00; /* Mario's yellow cap */
-            border-radius: 50%;
-            width: 120px;
-            height: 120px;
-            animation: spin 1.5s linear infinite;
-            z-index: 1000; /* Make sure spinner is on top */
-            display: none; /* Hidden by default */
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        body, html {
-            height: 100%;
-            background-color: #000; /* Dark background */
-            color: #fff; /* White text */
-        }
-
-        body {
-            margin: 0;
-            overflow: hidden;
-            font-family: 'Press Start 2P', cursive; /* Retro game font */
-        }
-
-        body, #box, #top {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
-
-        #input {
-            cursor: pointer;
-            position: absolute;
-            left: 0;
+        /* Estilos para la barra de navegación */
+        .navbar {
+            background-color: #3498db; /* Color de fondo de la barra de navegación */
+            padding: 10px; /* Espaciado interno */
+            display: flex; /* Usar flexbox para alinear los elementos */
+            justify-content: center; /* Centrar el contenido horizontalmente */
+            position: fixed; /* Fijar la barra en la parte superior */
             top: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
+            left: 0;
+            width: 100%; /* Ancho completo de la pantalla */
+            z-index: 1000; /* Asegurar que la barra esté por encima de otros elementos */
         }
 
-        #display {
-            width: 100%;
-            height: 100%;
+        /* Estilos para el botón de carga */
+        #file-button {
+            background-color: #fff; /* Color de fondo del botón */
+            color: #3498db; /* Color del texto del botón */
+            border: 1px solid #2980b9; /* Borde del botón */
+            border-radius: 0.4em; /* Bordes redondeados */
+            padding: 0.5em 1em; /* Espaciado interno */
+            font-family: 'Press Start 2P', cursive; /* Fuente retro */
+            font-weight: bold; /* Negrita */
+            font-size: 16px; /* Tamaño de fuente */
+            cursor: pointer; /* Mostrar cursor de mano */
+            transition-duration: 0.2s; /* Transición para el hover */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra del botón */
         }
 
-        select, button {
-            padding: 0.6em 0.4em;
-            margin: 0.5em;
-            width: 15em;
-            max-width: 100%;
-            font-family: 'Press Start 2P', cursive;
-            font-weight: bold;
-            font-size: 16px;
-            background-color: #3498db; /* Mario's blue overalls */
-            color: #fff;
-            border-radius: 0.4em;
-            border: 1px solid #2980b9; /* Darker blue */
-            cursor: pointer;
-            transition-duration: 0.2s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Button shadow */
+        /* Efecto hover para el botón */
+        #file-button:hover {
+            background-color: #2980b9; /* Color de fondo en hover */
+            color: #fff; /* Color del texto en hover */
         }
 
-        select:hover, button:hover {
-            background-color: #2980b9; /* Darker blue */
-            color: #f1c40f; /* Mario's yellow */
+        /* Estilos para el input de archivo, ocultar el control de archivo */
+        #input {
+            display: none; /* Ocultar el control de archivo */
         }
-
-        .logo {
-            width: 130px;
-            height: 130px;
-            filter: drop-shadow(0 0 10px #fff);
-        }
-
-        #top {
-            margin: 5px;
-            text-align: center;
-        }
-
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
     </style>
 </head>
 
 <body>
-    <div id="spinner"></div>
-
-    <div id="top">
-        <h1>Emulador Popular</h1>
-        <img src="https://i.ibb.co/BqbGpLn/pngwing-com.png" alt="Logo" class="logo">
-    </div>
-    <div id="box">
-        <!-- Input de archivo, que está oculto y será estilizado como un botón -->
-        <input type="file" id="input">
-        Pesca La rom y chantala Aqui mano!!!!
+    <!-- Barra de navegación -->
+    <div class="navbar">
+        <label for="input" id="file-button">Cargar Juego</label>
+        <input type="file" id="input" accept=".nes,.sfc,.smc,.gba,.gb,.nds,.pce">
     </div>
 
-    <script>
-        let enableDebug = false;
-        let enableThreads = false;
-        const queryString = window.location.search;
-        const urlParams = new URLSearchParams(queryString);
-
-        // Habilitar depuración si se pasa el parámetro 'debug' en la URL
-        if (urlParams.get('debug') == 1) {
-            enableDebug = true;
-            console.log("Debug is enabled");
-        } else {
-            console.log("Debug is disabled");
-        }
-
-        // Habilitar hilos si se pasa el parámetro 'threads' en la URL
-        if (urlParams.get('threads') == 1) {
-            if (window.SharedArrayBuffer) {
-                enableThreads = true;
-                console.log("Threads are enabled");
-            } else {
-                console.warn("Threads are disabled as SharedArrayBuffer is not available. Threads requires two headers to be set when sending your HTML page. See https://stackoverflow.com/a/68630724");
-                console.log("Threads are disabled");
-            }
-        } else {
-            console.log("Threads are disabled");
-        }
-
-        const spinner = document.getElementById('spinner');
-        const input = document.getElementById('input');
-        const box = document.getElementById('box');
-
-        // Manejo del evento de cambio en el input de archivo
-        input.onchange = async () => {
-            spinner.style.display = 'block'; // Mostrar el spinner de carga
-
-            const url = input.files[0]; // Obtener el archivo seleccionado
-            const parts = input.files[0].name.split("."); // Dividir el nombre del archivo por puntos para obtener la extensión
-
-            // Determinar el núcleo del emulador basado en la extensión del archivo
-            const core = await (async (ext) => {
-                if (["fds", "nes", "unif", "unf"].includes(ext))
-                    return "nes";
-                if (["smc", "fig", "sfc", "gd3", "gd7", "dx2", "bsx", "swc"].includes(ext))
-                    return "snes";
-                if (["z64", "n64"].includes(ext))
-                    return "n64";
-                if (["pce"].includes(ext))
-                    return "pce";
-                if (["ngp", "ngc"].includes(ext))
-                    return "ngp";
-                if (["ws", "wsc"].includes(ext))
-                    return "ws";
-                if (["col", "cv"].includes(ext))
-                    return "coleco";
-                if (["d64"].includes(ext))
-                    return "vice_x64sc";
-                if (["nds", "gba", "gb", "z64", "n64"].includes(ext))
-                    return ext;
-
-                // Crear una interfaz de usuario para seleccionar el núcleo si la extensión no es reconocida
-                return await new Promise(resolve => {
-                    var coreValues = {
-                        "Nintendo 64": "n64",
-                        "Nintendo Game Boy": "gb",
-                        "Nintendo Game Boy Advance": "gba",
-                        "Nintendo DS": "nds",
-                        "Nintendo Entertainment System": "nes",
-                        "Super Nintendo Entertainment System": "snes",
-                        "PlayStation": "psx",
-                        "Virtual Boy": "vb",
-                        "Sega Mega Drive": "segaMD",
-                        "Sega Master System": "segaMS",
-                        "Sega CD": "segaCD",
-                        "Atari Lynx": "lynx",
-                        "Sega 32X": "sega32x",
-                        "Atari Jaguar": "jaguar",
-                        "Sega Game Gear": "segaGG",
-                        "Sega Saturn": "segaSaturn",
-                        "Atari 7800": "atari7800",
-                        "Atari 2600": "atari2600",
-                        "NEC TurboGrafx-16/SuperGrafx/PC Engine": "pce",
-                        "NEC PC-FX": "pcfx",
-                        "SNK NeoGeo Pocket (Color)": "ngp",
-                        "Bandai WonderSwan (Color)": "ws",
-                        "ColecoVision": "coleco",
-                        "Commodore 64": "vice_x64sc",
-                        "Commodore 128": "vice_x128",
-                        "Commodore VIC20": "vice_xvic",
-                        "Commodore Plus/4": "vice_xplus4",
-                        "Commodore PET": "vice_xpet"
-                    };
-
-                    const cores = Object.keys(coreValues).sort().reduce(
-                        (obj, key) => { 
-                            obj[key] = coreValues[key]; 
-                            return obj;
-                        }, 
-                        {}
-                    );
-
-                    const button = document.createElement("button");
-                    const select = document.createElement("select");
-
-                    // Agregar opciones al menú de selección basado en los núcleos disponibles
-                    for (const type in cores) {
-                        const option = document.createElement("option");
-                        option.value = cores[type];
-                        option.textContent = type;
-                        select.appendChild(option);
-                    }
-
-                    // Configurar el botón para resolver la selección del núcleo
-                    button.onclick = () => resolve(select[select.selectedIndex].value);
-                    button.textContent = "Ok";
-                    document.body.appendChild(button);
-
-                    select.style.display = 'block';
-                    button.style.display = 'block';
-                });
-            })(parts.pop());
-
-            // Crear y configurar los elementos HTML para mostrar el emulador
-            const div = document.createElement("div");
-            const sub = document.createElement("div");
-            const script = document.createElement("script");
-
-            sub.id = "game";
-            div.id = "display";
-
-            const top = document.getElementById("top");
-            top.remove();
-            box.remove();
-            div.appendChild(sub);
-            document.body.appendChild(div);
-
-            // Configurar variables globales para el emulador
-            window.EJS_player = "#game";
-            window.EJS_gameName = parts.shift();
-            window.EJS_biosUrl = "";
-            window.EJS_gameUrl = url;
-            window.EJS_core = core;
-            window.EJS_pathtodata = "data/";
-            window.EJS_startOnLoaded = true;
-            window.EJS_DEBUG_XX = enableDebug;
-            window.EJS_disableDatabases = true;
-            window.EJS_threads = enableThreads;
-
-            // Cargar el script del emulador
-            script.src = "data/loader.js";
-            document.body.appendChild(script);
-
-            // Ocultar el spinner una vez que el script esté cargado
-            script.onload = () => {
-                spinner.style.display = 'none'; 
-            };
-        };
-    </script>
+    <!-- Contenido de la página -->
+    <div id="content" style="margin-top: 60px; text-align: center;">
+        <h1>Bienvenido al Emulador</h1>
+        <p>Selecciona un archivo para cargar.</p>
+    </div>
 </body>
 </html>

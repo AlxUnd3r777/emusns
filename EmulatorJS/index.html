@@ -1,38 +1,24 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>EmulatorJS Demo</title>
     <link rel="icon" href="docs/favicon.ico" sizes="16x16 32x32 48x48 64x64" type="image/vnd.microsoft.icon">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
-    <style>
-        body, html {
-            height: 100%;
-            margin: 0;
-            font-family: 'Press Start 2P', cursive;
-            background-color: #121212;
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        /* Estilos del spinner */
+    <style>
         #spinner {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            border: 16px solid #fff;
-            border-top: 16px solid #ffcc00;
+            border: 16px solid #fff; /* White border */
+            border-top: 16px solid #ffcc00; /* Mario's yellow cap */
             border-radius: 50%;
             width: 120px;
             height: 120px;
             animation: spin 1.5s linear infinite;
-            z-index: 1000;
-            display: none;
+            z-index: 1000; /* Make sure spinner is on top */
+            display: none; /* Hidden by default */
         }
 
         @keyframes spin {
@@ -40,68 +26,98 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Estilos del botón de carga */
-        #load-button {
-            padding: 10px 20px;
-            background-color: #2ecc71;
-            color: #8e44ad;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: box-shadow 0.3s;
-            font-size: 18px;
+        body, html {
+            height: 100%;
+            background-color: #000; /* Dark background */
+            color: #fff; /* White text */
         }
 
-        #load-button:hover {
-            box-shadow: 0 0 10px #8e44ad;
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Press Start 2P', cursive; /* Retro game font */
         }
 
-        /* Estilos del campo de búsqueda */
-        #search {
+        body, #box, #top {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            margin: 20px 0;
+            justify-content: center;
+            flex-direction: column;
         }
 
-        #search input {
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #2ecc71;
-            width: 200px;
-            margin-bottom: 10px;
-            background-color: #2c3e50;
-            color: #fff;
+    
+
+      
+
+        #input {
+            cursor: pointer;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
         }
+
+        #display {
+            width: 100%;
+            height: 100%;
+        }
+
+        select, button {
+            padding: 0.6em 0.4em;
+            margin: 0.5em;
+            width: 15em;
+            max-width: 100%;
+            font-family: 'Press Start 2P', cursive;
+            font-weight: bold;
+            font-size: 16px;
+            background-color: #3498db; /* Mario's blue overalls */
+            color: #fff;
+            border-radius: 0.4em;
+            border: 1px solid #2980b9; /* Darker blue */
+            cursor: pointer;
+            transition-duration: 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Button shadow */
+        }
+
+        select:hover, button:hover {
+            background-color: #2980b9; /* Darker blue */
+            color: #f1c40f; /* Mario's yellow */
+        }
+
+        .logo {
+            width: 130px;
+            height: 130px;
+            filter: drop-shadow(0 0 10px #fff);
+        }
+
+        #top {
+            margin: 5px;
+            text-align: center;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
     </style>
 </head>
+
 <body>
     <div id="spinner"></div>
 
     <div id="top">
         <h1>Emulador Popular</h1>
-        <img src="https://i.ibb.co/BqbGpLn/pngwing-com.png" alt="Logo" class="logo" style="width: 130px; height: 130px; filter: drop-shadow(0 0 10px #fff);">
+        <img src="https://i.ibb.co/BqbGpLn/pngwing-com.png" alt="Logo" class="logo">
     </div>
-
-    <nav>
-        <a href="#">Inicio</a>
-        <a href="https://www.retrostic.com/es/roms" target="_blank">Juegos</a>
-        <a href="#">Contacto</a>
-    </nav>
-
-    <div id="search">
-        <input type="text" id="search-input" placeholder="Buscar ROMs...">
-        <button id="load-button">Cargar ROM</button>
+    <div id="box">
+        <input type="file" id="input">
+        Pesca La rom y chantala Aqui mano!!!!
     </div>
-
-    <input type="file" id="input" style="display: none;">
 
     <script>
         let enableDebug = false;
         let enableThreads = false;
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
-
         if (urlParams.get('debug') == 1) {
             enableDebug = true;
             console.log("Debug is enabled");
@@ -114,7 +130,8 @@
                 enableThreads = true;
                 console.log("Threads are enabled");
             } else {
-                console.warn("Threads are disabled as SharedArrayBuffer is not available.");
+                console.warn("Threads are disabled as SharedArrayBuffer is not available. Threads requires two headers to be set when sending your HTML page. See https://stackoverflow.com/a/68630724");
+                console.log("Threads are disabled");
             }
         } else {
             console.log("Threads are disabled");
@@ -122,50 +139,45 @@
 
         const spinner = document.getElementById('spinner');
         const input = document.getElementById('input');
-        const loadButton = document.getElementById('load-button');
-
-        loadButton.onclick = () => {
-            input.click(); // Simula el clic en el input de archivo
-        };
+        const box = document.getElementById('box');
 
         input.onchange = async () => {
-            spinner.style.display = 'block'; // Muestra el spinner
+            spinner.style.display = 'block'; // Show the spinner
 
-            const file = input.files[0];
-            if (!file) return;
+            const url = input.files[0];
+            const parts = input.files[0].name.split(".");
 
-            const parts = file.name.split(".");
             const core = await (async (ext) => {
-                const coreMap = {
-                    "fds": "nes",
-                    "nes": "nes",
-                    "unif": "nes",
-                    "unf": "nes",
-                    "smc": "snes",
-                    "fig": "snes",
-                    "sfc": "snes",
-                    "gd3": "snes",
-                    "gd7": "snes",
-                    "dx2": "snes",
-                    "bsx": "snes",
-                    "swc": "snes",
-                    "z64": "n64",
-                    "n64": "n64",
-                    "pce": "pce",
-                    "ngp": "ngp",
-                    "ngc": "ngp",
-                    "ws": "ws",
-                    "wsc": "ws",
-                    "col": "coleco",
-                    "cv": "coleco",
-                    "d64": "vice_x64sc",
-                    "nds": "nds",
-                    "gba": "gba",
-                    "gb": "gb"
-                };
+                // Determine core type based on file extension
+                if (["fds", "nes", "unif", "unf"].includes(ext))
+                    return "nes";
 
-                return coreMap[ext] || await new Promise(resolve => {
-                    const coreValues = {
+                if (["smc", "fig", "sfc", "gd3", "gd7", "dx2", "bsx", "swc"].includes(ext))
+                    return "snes";
+
+                if (["z64", "n64"].includes(ext))
+                    return "n64";
+
+                if (["pce"].includes(ext))
+                    return "pce";
+
+                if (["ngp", "ngc"].includes(ext))
+                    return "ngp";
+
+                if (["ws", "wsc"].includes(ext))
+                    return "ws";
+
+                if (["col", "cv"].includes(ext))
+                    return "coleco";
+
+                if (["d64"].includes(ext))
+                    return "vice_x64sc";
+
+                if (["nds", "gba", "gb", "z64", "n64"].includes(ext))
+                    return ext;
+
+                return await new Promise(resolve => {
+                    var coreValues = {
                         "Nintendo 64": "n64",
                         "Nintendo Game Boy": "gb",
                         "Nintendo Game Boy Advance": "gba",
@@ -189,49 +201,75 @@
                         "SNK NeoGeo Pocket (Color)": "ngp",
                         "Bandai WonderSwan (Color)": "ws",
                         "ColecoVision": "coleco",
-                        "Commodore 64": "vice_x64sc"
+                        "Commodore 64": "vice_x64sc",
+                        "Commodore 128": "vice_x128",
+                        "Commodore VIC20": "vice_xvic",
+                        "Commodore Plus/4": "vice_xplus4",
+                        "Commodore PET": "vice_xpet"
                     };
 
+                    const cores = Object.keys(coreValues).sort().reduce(
+                        (obj, key) => { 
+                            obj[key] = coreValues[key]; 
+                            return obj;
+                        }, 
+                        {}
+                    );
+
+                    const button = document.createElement("button");
                     const select = document.createElement("select");
 
-                    for (const type in coreValues) {
+                    for (const type in cores) {
                         const option = document.createElement("option");
-                        option.value = coreValues[type];
-                        option.text = type;
+
+                        option.value = cores[type];
+                        option.textContent = type;
                         select.appendChild(option);
                     }
 
-                    const button = document.createElement("button");
-                    button.textContent = "Seleccionar Núcleo";
-                    button.onclick = () => {
-                        const selectedCore = select.value;
-                        resolve(selectedCore);
-                        document.body.removeChild(select);
-                        document.body.removeChild(button);
-                    };
-
-                    document.body.appendChild(select);
+                    button.onclick = () => resolve(select[select.selectedIndex].value);
+                    button.textContent = "Ok";
                     document.body.appendChild(button);
+
+                    select.style.display = 'block';
+                    button.style.display = 'block';
                 });
-            })(parts[parts.length - 1].toLowerCase());
+            })(parts.pop());
 
-            console.log("Núcleo seleccionado:", core);
-            const arrayBuffer = await file.arrayBuffer();
+            const div = document.createElement("div");
+            const sub = document.createElement("div");
+            const script = document.createElement("script");
 
-            const emulator = new Emulator(core, arrayBuffer, {
-                enableDebug,
-                enableThreads
-            });
+            sub.id = "game";
+            div.id = "display";
 
-            try {
-                await emulator.run();
-            } catch (error) {
-                console.error("Error durante la ejecución del emulador:", error);
-                alert("Hubo un error al cargar la ROM. Asegúrate de que el archivo sea compatible.");
-            } finally {
-                spinner.style.display = 'none';
-            }
+            const top = document.getElementById("top");
+            top.remove();
+            box.remove();
+            div.appendChild(sub);
+            document.body.appendChild(div);
+
+            window.EJS_player = "#game";
+            window.EJS_gameName = parts.shift();
+            window.EJS_biosUrl = "";
+            window.EJS_gameUrl = url;
+            window.EJS_core = core;
+            window.EJS_pathtodata = "data/";
+            window.EJS_startOnLoaded = true;
+            window.EJS_DEBUG_XX = enableDebug;
+            window.EJS_disableDatabases = true;
+            window.EJS_threads = enableThreads;
+
+            script.src = "data/loader.js";
+            document.body.appendChild(script);
+
+            script.onload = () => {
+                spinner.style.display = 'none'; // Hide the spinner once the script is loaded
+            };
         };
+
+        box.ondragover = () => box.setAttribute("drag", true);
+        box.ondragleave = () => box.removeAttribute("drag");
     </script>
 </body>
 </html>

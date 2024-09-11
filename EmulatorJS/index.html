@@ -6,58 +6,150 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <style>
-        /* Estilos para la barra de navegación */
         .navbar {
-            background-color: #3498db; /* Color de fondo de la barra de navegación */
-            padding: 10px; /* Espaciado interno */
-            display: flex; /* Usar flexbox para alinear los elementos */
-            justify-content: center; /* Centrar el contenido horizontalmente */
-            position: fixed; /* Fijar la barra en la parte superior */
+            background-color: #3498db;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            position: fixed;
             top: 0;
             left: 0;
-            width: 100%; /* Ancho completo de la pantalla */
-            z-index: 1000; /* Asegurar que la barra esté por encima de otros elementos */
+            width: 100%;
+            z-index: 1000;
         }
 
-        /* Estilos para el botón de carga */
         #file-button {
-            background-color: #fff; /* Color de fondo del botón */
-            color: #3498db; /* Color del texto del botón */
-            border: 1px solid #2980b9; /* Borde del botón */
-            border-radius: 0.4em; /* Bordes redondeados */
-            padding: 0.5em 1em; /* Espaciado interno */
-            font-family: 'Press Start 2P', cursive; /* Fuente retro */
-            font-weight: bold; /* Negrita */
-            font-size: 16px; /* Tamaño de fuente */
-            cursor: pointer; /* Mostrar cursor de mano */
-            transition-duration: 0.2s; /* Transición para el hover */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra del botón */
+            background-color: #fff;
+            color: #3498db;
+            border: 1px solid #2980b9;
+            border-radius: 0.4em;
+            padding: 0.5em 1em;
+            font-family: 'Press Start 2P', cursive;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition-duration: 0.2s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
-        /* Efecto hover para el botón */
         #file-button:hover {
-            background-color: #2980b9; /* Color de fondo en hover */
-            color: #fff; /* Color del texto en hover */
+            background-color: #2980b9;
+            color: #fff;
         }
 
-        /* Estilos para el input de archivo, ocultar el control de archivo */
         #input {
-            display: none; /* Ocultar el control de archivo */
+            display: none;
+        }
+
+        #spinner {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 16px solid #fff;
+            border-top: 16px solid #ffcc00;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 1.5s linear infinite;
+            z-index: 1000;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        body {
+            margin: 0;
+            padding-top: 60px; /* Adjusted for fixed navbar */
+            background-color: #000;
+            color: #fff;
+            font-family: 'Press Start 2P', cursive;
+            overflow: hidden;
+        }
+
+        #content {
+            text-align: center;
         }
     </style>
 </head>
 
 <body>
-    <!-- Barra de navegación -->
+    <div id="spinner"></div>
+
     <div class="navbar">
         <label for="input" id="file-button">Cargar Juego</label>
         <input type="file" id="input" accept=".nes,.sfc,.smc,.gba,.gb,.nds,.pce">
     </div>
 
-    <!-- Contenido de la página -->
-    <div id="content" style="margin-top: 60px; text-align: center;">
+    <div id="content">
         <h1>Bienvenido al Emulador</h1>
         <p>Selecciona un archivo para cargar.</p>
     </div>
+
+    <script>
+        const spinner = document.getElementById('spinner');
+        const input = document.getElementById('input');
+        const content = document.getElementById('content');
+
+        input.addEventListener('change', async () => {
+            if (input.files.length === 0) return;
+
+            const file = input.files[0];
+            const fileNameParts = file.name.split(".");
+            const fileExtension = fileNameParts.pop().toLowerCase();
+
+            // Show the spinner
+            spinner.style.display = 'block';
+
+            let core;
+            switch(fileExtension) {
+                case 'nes':
+                case 'unif':
+                case 'fds':
+                    core = 'nes';
+                    break;
+                case 'sfc':
+                case 'smc':
+                    core = 'snes';
+                    break;
+                case 'gba':
+                    core = 'gba';
+                    break;
+                case 'nds':
+                    core = 'nds';
+                    break;
+                case 'gb':
+                    core = 'gb';
+                    break;
+                case 'pce':
+                    core = 'pce';
+                    break;
+                default:
+                    alert('Formato de archivo no soportado');
+                    spinner.style.display = 'none';
+                    return;
+            }
+
+            const script = document.createElement('script');
+            script.src = 'data/loader.js';
+            document.body.appendChild(script);
+
+            script.onload = () => {
+                // Initialize the emulator with the selected file
+                window.EJS_player = "#content";
+                window.EJS_gameName = fileNameParts.join(".");
+                window.EJS_gameUrl = URL.createObjectURL(file); // Use a URL object for local file access
+                window.EJS_core = core;
+                window.EJS_pathtodata = "data/";
+                window.EJS_startOnLoaded = true;
+
+                // Hide the spinner after initializing
+                spinner.style.display = 'none';
+            };
+        });
+    </script>
 </body>
 </html>

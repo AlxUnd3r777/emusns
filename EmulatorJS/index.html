@@ -110,22 +110,29 @@
             50% { color: #f1c40f; }
         }
 
-        button, select {
-            padding: 10px 15px;
-            margin: 10px;
-            font-size: 16px;
-            color: #fff;
-            background-color: #3498db;
+        /* Botón Seleccionar Archivo */
+        #selectFileBtn {
+            padding: 20px 40px;
+            font-size: 20px;
+            color: #800080; /* Letras moradas */
+            background-color: #39ff14; /* Fondo verde */
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             cursor: pointer;
-            transition: background-color 0.3s, transform 0.3s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            transition: background-color 0.3s, color 0.3s, transform 0.3s;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+            margin: 20px auto;
+            display: block;
         }
 
-        button:hover, select:hover {
-            background-color: #2980b9;
+        #selectFileBtn:hover {
+            background-color: #28a745; /* Verde más oscuro al pasar el mouse */
+            color: #ff00ff; /* Cambia a magenta al pasar el mouse */
             transform: translateY(-4px);
+        }
+
+        input[type="file"] {
+            display: none;
         }
     </style>
 </head>
@@ -149,6 +156,8 @@
     <img src="https://i.ibb.co/BqbGpLn/pngwing-com.png" alt="Logo" class="logo">
 </div>
 <div id="box">
+    <!-- Botón Personalizado para Seleccionar Archivo -->
+    <label for="input" id="selectFileBtn">Seleccionar Archivo</label>
     <input type="file" id="input">
     <p>¡Pesca la ROM y chántala aquí, mano!</p>
 </div>

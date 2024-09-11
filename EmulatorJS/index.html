@@ -1,7 +1,6 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
     <title>EmulatorJS Demo</title>
     <link rel="icon" href="docs/favicon.ico" sizes="16x16 32x32 48x48 64x64" type="image/vnd.microsoft.icon">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,14 +11,14 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            border: 16px solid #fff;
-            border-top: 16px solid #ffcc00;
+            border: 16px solid #fff; /* White border */
+            border-top: 16px solid #ffcc00; /* Mario's yellow cap */
             border-radius: 50%;
             width: 120px;
             height: 120px;
             animation: spin 1.5s linear infinite;
-            z-index: 1000;
-            display: none;
+            z-index: 1000; /* Make sure spinner is on top */
+            display: none; /* Hidden by default */
         }
 
         @keyframes spin {
@@ -29,14 +28,14 @@
 
         body, html {
             height: 100%;
-            background-color: #000;
-            color: #fff;
+            background-color: #000; /* Dark background */
+            color: #fff; /* White text */
         }
 
         body {
             margin: 0;
             overflow: hidden;
-            font-family: 'Press Start 2P', cursive;
+            font-family: 'Press Start 2P', cursive; /* Retro game font */
         }
 
         body, #box, #top {
@@ -45,6 +44,10 @@
             justify-content: center;
             flex-direction: column;
         }
+
+    
+
+      
 
         #input {
             cursor: pointer;
@@ -69,18 +72,18 @@
             font-family: 'Press Start 2P', cursive;
             font-weight: bold;
             font-size: 16px;
-            background-color: #3498db;
+            background-color: #3498db; /* Mario's blue overalls */
             color: #fff;
             border-radius: 0.4em;
-            border: 1px solid #2980b9;
+            border: 1px solid #2980b9; /* Darker blue */
             cursor: pointer;
             transition-duration: 0.2s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Button shadow */
         }
 
         select:hover, button:hover {
-            background-color: #2980b9;
-            color: #f1c40f;
+            background-color: #2980b9; /* Darker blue */
+            color: #f1c40f; /* Mario's yellow */
         }
 
         .logo {
@@ -115,7 +118,6 @@
         let enableThreads = false;
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
-
         if (urlParams.get('debug') == 1) {
             enableDebug = true;
             console.log("Debug is enabled");
@@ -128,7 +130,7 @@
                 enableThreads = true;
                 console.log("Threads are enabled");
             } else {
-                console.warn("Threads are disabled as SharedArrayBuffer is not available.");
+                console.warn("Threads are disabled as SharedArrayBuffer is not available. Threads requires two headers to be set when sending your HTML page. See https://stackoverflow.com/a/68630724");
                 console.log("Threads are disabled");
             }
         } else {
@@ -146,6 +148,7 @@
             const parts = input.files[0].name.split(".");
 
             const core = await (async (ext) => {
+                // Determine core type based on file extension
                 if (["fds", "nes", "unif", "unf"].includes(ext))
                     return "nes";
 
@@ -174,7 +177,7 @@
                     return ext;
 
                 return await new Promise(resolve => {
-                    const coreValues = {
+                    var coreValues = {
                         "Nintendo 64": "n64",
                         "Nintendo Game Boy": "gb",
                         "Nintendo Game Boy Advance": "gba",
@@ -246,23 +249,27 @@
             div.appendChild(sub);
             document.body.appendChild(div);
 
-            // EmuladorJS Configuración
             window.EJS_player = "#game";
             window.EJS_gameName = parts.shift();
-            window.EJS_biosUrl = "/data/bios/";
-            window.EJS_gameUrl = URL.createObjectURL(url);
+            window.EJS_biosUrl = "";
+            window.EJS_gameUrl = url;
             window.EJS_core = core;
-            window.EJS_pathtodata = "/data/";
-            window.EJS_debugger = enableDebug;
-            window.EJS_enableLightspeed = enableThreads;
+            window.EJS_pathtodata = "data/";
+            window.EJS_startOnLoaded = true;
+            window.EJS_DEBUG_XX = enableDebug;
+            window.EJS_disableDatabases = true;
+            window.EJS_threads = enableThreads;
 
-            script.src = "/data/loader.js";
-            div.appendChild(script);
+            script.src = "data/loader.js";
+            document.body.appendChild(script);
 
             script.onload = () => {
-                spinner.style.display = 'none'; // Hide the spinner once the game loads
+                spinner.style.display = 'none'; // Hide the spinner once the script is loaded
             };
         };
+
+        box.ondragover = () => box.setAttribute("drag", true);
+        box.ondragleave = () => box.removeAttribute("drag");
     </script>
 </body>
 </html>

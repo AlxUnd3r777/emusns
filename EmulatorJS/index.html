@@ -37,42 +37,6 @@
             font-family: 'Press Start 2P', cursive;
         }
 
-        /* Contenedor del Botón de Selección de Archivo */
-        #box {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            height: 80vh;
-        }
-
-        #input {
-            cursor: pointer;
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-        }
-
-        label {
-            cursor: pointer;
-            padding: 20px;
-            background-color: #00ff00; /* Verde brillante */
-            color: #800080; /* Morado */
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: bold;
-            display: inline-block;
-            transition: background-color 0.3s, transform 0.3s;
-        }
-
-        label:hover {
-            background-color: #00cc00; /* Verde más oscuro */
-            transform: scale(1.05);
-        }
-
         /* Botón Morado */
         #button-container {
             position: absolute;
@@ -95,6 +59,34 @@
         .button:hover {
             background-color: #9932cc; /* Morado más claro */
             transform: scale(1.05);
+        }
+
+        /* Botón de Selección de Archivo */
+        .file-button {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .file-button input[type="file"] {
+            cursor: pointer;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+        }
+
+        .file-button .button {
+            display: block;
+            padding: 15px 30px;
+            background-color: #00ff00; /* Verde brillante */
+            color: #800080; /* Morado */
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
         }
 
         /* Título Parpadeante */
@@ -129,10 +121,10 @@
         <img src="https://i.ibb.co/BqbGpLn/pngwing-com.png" alt="Logo" class="logo">
     </div>
 
-    <!-- Contenedor para el Archivo -->
-    <div id="box">
+    <!-- Contenedor para el Botón de Selección de Archivo -->
+    <div id="box" class="file-button">
         <input type="file" id="input" accept=".nes,.sfc,.smc,.gba,.gb,.nds,.pce">
-        <label for="input">Seleccionar Archivo</label>
+        <button class="button">Seleccionar Archivo</button>
     </div>
 
     <!-- Contenedor para el Botón -->
@@ -167,6 +159,11 @@
         const spinner = document.getElementById('spinner');
         const input = document.getElementById('input');
         const box = document.getElementById('box');
+
+        // Establece el comportamiento del botón de selección de archivo
+        box.querySelector('.button').onclick = () => {
+            input.click(); // Simula el clic en el input de archivo
+        };
 
         input.onchange = async () => {
             spinner.style.display = 'block'; // Mostrar el spinner
@@ -260,54 +257,48 @@
                     select.style.display = 'block';
                     button.style.display = 'block';
                 });
-            })(parts.pop());
+            })(parts[parts.length - 1]);
 
-            const div = document.createElement("div");
-            const sub = document.createElement("div");
-            const script = document.createElement("script");
+            const script = document.createElement('script');
+            script.src = "";
+            script.onload = async () => {
+                if (enableThreads) {
+                    script.src = "https://cdn.jsdelivr.net/gh/EmulatorJS/EmulatorJS@master/dist/threads.min.js";
+                    document.head.appendChild(script);
+                    script.onload = async () => {
+                        const worker = new Worker("https://cdn.jsdelivr.net/gh/EmulatorJS/EmulatorJS@master/dist/threads.js");
 
-            sub.id = "game";
-            div.id = "display";
+                        worker.onmessage = (e) => {
+                            const data = e.data;
+                            if (data.type === "loaded") {
+                                worker.postMessage({ type: "load", url, core });
+                            } else if (data.type === "error") {
+                                console.error(data.error);
+                            } else if (data.type === "ready") {
+                                spinner.style.display = 'none'; // Ocultar el spinner
+                            }
+                        };
 
-            const top = document.getElementById("top");
-            top.appendChild(div);
-
-            if (enableThreads) {
-                script.src = "https://cdn.jsdelivr.net/gh/EmulatorJS/EmulatorJS@master/dist/threads.min.js";
-                document.head.appendChild(script);
-                script.onload = async () => {
-                    const worker = new Worker("https://cdn.jsdelivr.net/gh/EmulatorJS/EmulatorJS@master/dist/threads.js");
-
-                    worker.onmessage = (e) => {
-                        const data = e.data;
-                        if (data.type === "loaded") {
-                            worker.postMessage({ type: "load", url, core });
-                        } else if (data.type === "error") {
-                            console.error(data.error);
-                        } else if (data.type === "ready") {
-                            spinner.style.display = 'none'; // Ocultar el spinner
-                        }
+                        worker.postMessage({ type: "init", core });
                     };
+                } else {
+                    script.src = "https://cdn.jsdelivr.net/gh/EmulatorJS/EmulatorJS@master/dist/emulator.min.js";
+                    document.head.appendChild(script);
+                    script.onload = async () => {
+                        const emulator = await Emulator.load(url, core);
+                        emulator.run();
 
-                    worker.postMessage({ type: "init", core });
-                };
-            } else {
-                script.src = "https://cdn.jsdelivr.net/gh/EmulatorJS/EmulatorJS@master/dist/emulator.min.js";
-                document.head.appendChild(script);
-                script.onload = async () => {
-                    const emulator = await Emulator.load(url, core);
-                    emulator.run();
+                        emulator.on("loaded", () => {
+                            spinner.style.display = 'none'; // Ocultar el spinner
+                        });
 
-                    emulator.on("loaded", () => {
-                        spinner.style.display = 'none'; // Ocultar el spinner
-                    });
-
-                    emulator.on("error", (e) => {
-                        console.error(e);
-                        spinner.style.display = 'none'; // Ocultar el spinner
-                    });
-                };
-            }
+                        emulator.on("error", (e) => {
+                            console.error(e);
+                            spinner.style.display = 'none'; // Ocultar el spinner
+                        });
+                    };
+                }
+            };
         };
     </script>
 </body>

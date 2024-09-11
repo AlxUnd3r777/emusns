@@ -54,7 +54,7 @@
             height: 100%;
         }
 
-        select, button {
+        select {
             padding: 0.6em 0.4em;
             margin: 0.5em;
             width: 15em;
@@ -71,7 +71,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Button shadow */
         }
 
-        select:hover, button:hover {
+        select:hover {
             background-color: #2980b9; /* Darker blue */
             color: #f1c40f; /* Mario's yellow */
         }
@@ -99,9 +99,8 @@
         <img src="https://i.ibb.co/BqbGpLn/pngwing-com.png" alt="Logo" class="logo">
     </div>
     <div id="box">
-        <button id="fileButton">Seleccionar ROM</button>
-        <input type="file" id="input">
-        Pesca La rom y chantala Aqui mano!!!!
+        <input type="file" id="input" accept=".nes, .sfc, .smc, .gba, .nds, .gb, .pce, .z64, .ngp, .ws, .col, .d64" />
+        <p>Pescala la ROM y cántala aquí mano!!!!</p>
     </div>
 
     <script>
@@ -130,10 +129,6 @@
 
         const spinner = document.getElementById('spinner');
         const input = document.getElementById('input');
-        const box = document.getElementById('box');
-        const fileButton = document.getElementById('fileButton');
-
-        fileButton.onclick = () => input.click(); // Trigger file input click
 
         input.onchange = async () => {
             spinner.style.display = 'block'; // Show the spinner
@@ -239,7 +234,7 @@
 
             const top = document.getElementById("top");
             top.remove();
-            box.remove();
+            document.getElementById("box").remove();
             div.appendChild(sub);
             document.body.appendChild(div);
 
@@ -259,7 +254,6 @@
 
             script.onload = () => {
                 window.game = new EJS_game();
-
                 window.game._bootGame = () => {
                     spinner.style.display = 'none'; // Hide the spinner
                 };

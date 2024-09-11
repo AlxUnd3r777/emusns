@@ -3,43 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EmulatorJS Demo</title>
+    <title>Emulador Popular</title>
     <link rel="icon" href="docs/favicon.ico" sizes="16x16 32x32 48x48 64x64" type="image/vnd.microsoft.icon">
     <style>
-nav {
-    background-color: #333;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1000;
-}
+        /* Estilos Generales */
+        body, html {
+            height: 100%;
+            margin: 0;
+            overflow-x: hidden;
+            background: linear-gradient(90deg, #0f0c29, #302b63, #24243e); /* Fondo psicodélico */
+            font-family: 'Press Start 2P', cursive; /* Fuente de estilo retro */
+            color: #fff;
+        }
 
-nav ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-}
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-nav ul li {
-    margin: 0;
-}
+        /* Estilo del Menú de Navegación */
+        nav {
+            background-color: rgba(0, 0, 0, 0.8);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            padding: 10px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+        }
 
-nav ul li a {
-    display: block;
-    padding: 1em;
-    color: #fff;
-    text-decoration: none;
-    font-family: 'Press Start 2P', cursive;
-    transition: background-color 0.3s;
-}
+        nav ul {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
 
-nav ul li a:hover {
-    background-color: #444;
-}
+        nav ul li {
+            margin: 0 15px;
+        }
 
-        
+        nav ul li a {
+            color: #00ff00;
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: #ff0000;
+        }
+
+        /* Título Parpadeante */
+        #top h1 {
+            animation: blink 1s infinite alternate-reverse, glitch 0.5s infinite;
+            text-align: center;
+            margin-top: 70px; /* Ajuste para que no se superponga al menú */
+        }
+
+        /* Animación Parpadeante */
+        @keyframes blink {
+            0% { color: #39ff14; } /* Verde fluorescente */
+            33% { color: #ff00ff; } /* Magenta */
+            66% { color: #ff4500; } /* Rojo escarlata */
+            100% { color: #00ffff; } /* Cian */
+        }
+
+        /* Animación de Glitch */
+        @keyframes glitch {
+            0% { transform: skew(5deg, 0deg); text-shadow: -2px 2px 0 #00ff00, 2px -2px 0 #ff0000; }
+            50% { transform: skew(-5deg, 0deg); text-shadow: -2px 2px 0 #ff00ff, 2px -2px 0 #00ffff; }
+            100% { transform: skew(5deg, 0deg); text-shadow: -2px 2px 0 #00ffff, 2px -2px 0 #ff00ff; }
+        }
+
+        /* Estilo del Spinner */
         #spinner {
             position: fixed;
             top: 50%;
@@ -60,64 +96,46 @@ nav ul li a:hover {
             100% { transform: rotate(360deg); }
         }
 
-        body, html {
-            height: 100%;
-            background-color: #000;
-            color: #fff;
-            margin: 0;
-            overflow: hidden;
-            font-family: 'Press Start 2P', cursive;
-        }
-
+        /* Estilos para Contenido Principal */
         #box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+            margin-top: 120px; /* Ajustar el margen superior para evitar superposición */
             text-align: center;
+            color: #ffcc00;
+            font-size: 18px;
+            animation: colorChange 5s infinite;
         }
 
-        #input {
-            display: none; /* Oculta el input de archivo */
+        @keyframes colorChange {
+            0%, 100% { color: #ffcc00; }
+            50% { color: #f1c40f; }
         }
 
-        label {
-            padding: 0.6em 1.2em;
-            font-family: 'Press Start 2P', cursive;
-            font-weight: bold;
+        button, select {
+            padding: 10px 15px;
+            margin: 10px;
             font-size: 16px;
-            background-color: #3498db;
             color: #fff;
-            border-radius: 0.4em;
-            border: 1px solid #2980b9;
+            background-color: #3498db;
+            border: none;
+            border-radius: 8px;
             cursor: pointer;
-            transition-duration: 0.2s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s, transform 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
         }
 
-        label:hover {
+        button:hover, select:hover {
             background-color: #2980b9;
-            color: #f1c40f;
+            transform: translateY(-4px);
         }
-
-        .logo {
-            width: 130px;
-            height: 130px;
-            filter: drop-shadow(0 0 10px #fff);
-        }
-
-        #top {
-            margin: 5px;
-            text-align: center;
-        }
-
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
     </style>
 </head>
-
 <body>
-    <nav>
+
+<!-- Spinner de Carga -->
+<div id="spinner"></div>
+
+<!-- Menú de Navegación -->
+<nav>
     <ul>
         <li><a href="https://alxund3r777.github.io/portafolio/" target="_blank">Inicio</a></li>
         <li><a href="######" target="_blank">Contacto</a></li>
@@ -125,163 +143,60 @@ nav ul li a:hover {
     </ul>
 </nav>
 
-    <div id="spinner"></div>
+<!-- Contenido Principal -->
+<div id="top">
+    <h1>Emulador Popular</h1>
+    <img src="https://i.ibb.co/BqbGpLn/pngwing-com.png" alt="Logo" class="logo">
+</div>
+<div id="box">
+    <input type="file" id="input">
+    <p>¡Pesca la ROM y chántala aquí, mano!</p>
+</div>
 
-    <div id="top">
-        <h1>Emulador Popular</h1>
-        <img src="https://i.ibb.co/BqbGpLn/pngwing-com.png" alt="Logo" class="logo">
-    </div>
-    <div id="box">
-        <!-- Etiqueta que actúa como botón de carga -->
-        <label for="input">Pesca la ROM y chántala aquí, mano!</label>
-        <!-- Input de archivo oculto -->
-        <input type="file" id="input">
-    </div>
+<script>
+    // JavaScript para cargar y manejar la ROM
+    const spinner = document.getElementById('spinner');
+    const input = document.getElementById('input');
 
-    <script>
-        let enableDebug = false;
-        let enableThreads = false;
-        const queryString = window.location.search;
-        const urlParams = new URLSearchParams(queryString);
+    input.onchange = async () => {
+        spinner.style.display = 'block'; // Mostrar spinner
 
-        if (urlParams.get('debug') == 1) {
-            enableDebug = true;
-            console.log("Debug is enabled");
-        } else {
-            console.log("Debug is disabled");
-        }
+        const url = input.files[0];
+        const parts = input.files[0].name.split(".");
+        const core = await (async (ext) => {
+            if (["fds", "nes", "unif", "unf"].includes(ext)) return "nes";
+            if (["smc", "fig", "sfc", "gd3", "gd7", "dx2", "bsx", "swc"].includes(ext)) return "snes";
+            if (["z64", "n64"].includes(ext)) return "n64";
+            if (["pce"].includes(ext)) return "pce";
+            return "generic";
+        })(parts.pop());
 
-        if (urlParams.get('threads') == 1) {
-            if (window.SharedArrayBuffer) {
-                enableThreads = true;
-                console.log("Threads are enabled");
-            } else {
-                console.warn("Threads are disabled as SharedArrayBuffer is not available.");
-                console.log("Threads are disabled");
-            }
-        } else {
-            console.log("Threads are disabled");
-        }
+        const div = document.createElement("div");
+        const sub = document.createElement("div");
+        const script = document.createElement("script");
 
-        const spinner = document.getElementById('spinner');
-        const input = document.getElementById('input');
+        sub.id = "game";
+        div.id = "display";
 
-        input.onchange = async () => {
-            spinner.style.display = 'block'; // Mostrar el spinner
+        const top = document.getElementById("top");
+        top.remove();
+        document.body.appendChild(div);
+        div.appendChild(sub);
 
-            const url = input.files[0];
-            const parts = input.files[0].name.split(".");
+        window.EJS_player = "#game";
+        window.EJS_gameName = parts.shift();
+        window.EJS_core = core;
+        window.EJS_pathtodata = "data/";
+        window.EJS_startOnLoaded = true;
 
-            const core = await (async (ext) => {
-                if (["fds", "nes", "unif", "unf"].includes(ext))
-                    return "nes";
-                if (["smc", "fig", "sfc", "gd3", "gd7", "dx2", "bsx", "swc"].includes(ext))
-                    return "snes";
-                if (["z64", "n64"].includes(ext))
-                    return "n64";
-                if (["pce"].includes(ext))
-                    return "pce";
-                if (["ngp", "ngc"].includes(ext))
-                    return "ngp";
-                if (["ws", "wsc"].includes(ext))
-                    return "ws";
-                if (["col", "cv"].includes(ext))
-                    return "coleco";
-                if (["d64"].includes(ext))
-                    return "vice_x64sc";
-                if (["nds", "gba", "gb", "z64", "n64"].includes(ext))
-                    return ext;
+        script.src = "data/loader.js";
+        document.body.appendChild(script);
 
-                return await new Promise(resolve => {
-                    var coreValues = {
-                        "Nintendo 64": "n64",
-                        "Nintendo Game Boy": "gb",
-                        "Nintendo Game Boy Advance": "gba",
-                        "Nintendo DS": "nds",
-                        "Nintendo Entertainment System": "nes",
-                        "Super Nintendo Entertainment System": "snes",
-                        "PlayStation": "psx",
-                        "Virtual Boy": "vb",
-                        "Sega Mega Drive": "segaMD",
-                        "Sega Master System": "segaMS",
-                        "Sega CD": "segaCD",
-                        "Atari Lynx": "lynx",
-                        "Sega 32X": "sega32x",
-                        "Atari Jaguar": "jaguar",
-                        "Sega Game Gear": "segaGG",
-                        "Sega Saturn": "segaSaturn",
-                        "Atari 7800": "atari7800",
-                        "Atari 2600": "atari2600",
-                        "NEC TurboGrafx-16/SuperGrafx/PC Engine": "pce",
-                        "NEC PC-FX": "pcfx",
-                        "SNK NeoGeo Pocket (Color)": "ngp",
-                        "Bandai WonderSwan (Color)": "ws",
-                        "ColecoVision": "coleco",
-                        "Commodore 64": "vice_x64sc",
-                        "Commodore 128": "vice_x128",
-                        "Commodore VIC20": "vice_xvic",
-                        "Commodore Plus/4": "vice_xplus4",
-                        "Commodore PET": "vice_xpet"
-                    };
-
-                    const cores = Object.keys(coreValues).sort().reduce(
-                        (obj, key) => { 
-                            obj[key] = coreValues[key]; 
-                            return obj;
-                        }, 
-                        {}
-                    );
-
-                    const button = document.createElement("button");
-                    const select = document.createElement("select");
-
-                    for (const type in cores) {
-                        const option = document.createElement("option");
-                        option.value = cores[type];
-                        option.textContent = type;
-                        select.appendChild(option);
-                    }
-
-                    button.onclick = () => resolve(select[select.selectedIndex].value);
-                    button.textContent = "Ok";
-                    document.body.appendChild(button);
-
-                    select.style.display = 'block';
-                    button.style.display = 'block';
-                });
-            })(parts.pop());
-
-            const div = document.createElement("div");
-            const sub = document.createElement("div");
-            const script = document.createElement("script");
-
-            sub.id = "game";
-            div.id = "display";
-
-            const top = document.getElementById("top");
-            top.remove();
-            document.getElementById('box').remove();
-            div.appendChild(sub);
-            document.body.appendChild(div);
-
-            window.EJS_player = "#game";
-            window.EJS_gameName = parts.shift();
-            window.EJS_biosUrl = "";
-            window.EJS_gameUrl = url;
-            window.EJS_core = core;
-            window.EJS_pathtodata = "data/";
-            window.EJS_startOnLoaded = true;
-            window.EJS_DEBUG_XX = enableDebug;
-            window.EJS_disableDatabases = true;
-            window.EJS_threads = enableThreads;
-
-            script.src = "data/loader.js";
-            document.body.appendChild(script);
-
-            script.onload = () => {
-                spinner.style.display = 'none';
-            };
+        script.onload = () => {
+            spinner.style.display = 'none'; // Ocultar spinner
         };
-    </script>
+    };
+</script>
+
 </body>
 </html>

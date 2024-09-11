@@ -3,79 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emulador Popular</title>
+    <title>EmulatorJS Demo</title>
     <link rel="icon" href="docs/favicon.ico" sizes="16x16 32x32 48x48 64x64" type="image/vnd.microsoft.icon">
     <style>
-        /* Estilos Generales */
-        body, html {
-            height: 100%;
-            margin: 0;
-            overflow-x: hidden;
-            background: linear-gradient(90deg, #0f0c29, #302b63, #24243e); /* Fondo psicodélico */
-            font-family: 'Press Start 2P', cursive; /* Fuente de estilo retro */
-            color: #fff;
-        }
-
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
-        /* Estilo del Menú de Navegación */
-        nav {
-            background-color: rgba(0, 0, 0, 0.8);
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-            display: flex;
-            justify-content: center;
-            padding: 10px 0;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
-        }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        nav ul li {
-            margin: 0 15px;
-        }
-
-        nav ul li a {
-            color: #00ff00;
-            text-decoration: none;
-            font-size: 16px;
-            transition: color 0.3s;
-        }
-
-        nav ul li a:hover {
-            color: #ff0000;
-        }
-
-        /* Título Parpadeante */
-        #top h1 {
-            animation: blink 1s infinite alternate-reverse, glitch 0.5s infinite;
-            text-align: center;
-            margin-top: 70px; /* Ajuste para que no se superponga al menú */
-        }
-
-        /* Animación Parpadeante */
-        @keyframes blink {
-            0% { color: #39ff14; } /* Verde fluorescente */
-            33% { color: #ff00ff; } /* Magenta */
-            66% { color: #ff4500; } /* Rojo escarlata */
-            100% { color: #00ffff; } /* Cian */
-        }
-
-        /* Animación de Glitch */
-        @keyframes glitch {
-            0% { transform: skew(5deg, 0deg); text-shadow: -2px 2px 0 #00ff00, 2px -2px 0 #ff0000; }
-            50% { transform: skew(-5deg, 0deg); text-shadow: -2px 2px 0 #ff00ff, 2px -2px 0 #00ffff; }
-            100% { transform: skew(5deg, 0deg); text-shadow: -2px 2px 0 #00ffff, 2px -2px 0 #ff00ff; }
-        }
-
-        /* Estilo del Spinner */
+        /* Estilos del Spinner */
         #spinner {
             position: fixed;
             top: 50%;
@@ -96,116 +27,138 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Estilos para Contenido Principal */
-        #box {
-            margin-top: 120px; /* Ajustar el margen superior para evitar superposición */
-            text-align: center;
-            color: #ffcc00;
-            font-size: 18px;
-            animation: colorChange 5s infinite;
+        body, html {
+            height: 100%;
+            margin: 0;
+            background-color: #000;
+            color: #fff;
+            font-family: 'Press Start 2P', cursive;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
         }
 
-        @keyframes colorChange {
-            0%, 100% { color: #ffcc00; }
-            50% { color: #f1c40f; }
-        }
-
-        /* Botón Seleccionar Archivo */
-        #selectFileBtn {
-            padding: 20px 40px;
-            font-size: 20px;
-            color: #800080; /* Letras moradas */
-            background-color: #39ff14; /* Fondo verde */
-            border: none;
-            border-radius: 12px;
+        #input {
             cursor: pointer;
-            transition: background-color 0.3s, color 0.3s, transform 0.3s;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
-            margin: 20px auto;
-            display: block;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
         }
 
-        #selectFileBtn:hover {
-            background-color: #28a745; /* Verde más oscuro al pasar el mouse */
-            color: #ff00ff; /* Cambia a magenta al pasar el mouse */
-            transform: translateY(-4px);
+        #display {
+            width: 100%;
+            height: 100%;
         }
 
-        input[type="file"] {
-            display: none;
+        #top {
+            margin: 5px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 130px;
+            height: 130px;
+            filter: drop-shadow(0 0 10px #fff);
+        }
+
+        button, select {
+            padding: 0.6em 0.4em;
+            margin: 0.5em;
+            width: 15em;
+            max-width: 100%;
+            font-family: 'Press Start 2P', cursive;
+            font-weight: bold;
+            font-size: 16px;
+            background-color: #3498db;
+            color: #fff;
+            border-radius: 0.4em;
+            border: 1px solid #2980b9;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        button:hover, select:hover {
+            background-color: #2980b9;
+            color: #f1c40f;
         }
     </style>
 </head>
 <body>
 
-<!-- Spinner de Carga -->
-<div id="spinner"></div>
+    <div id="spinner"></div>
 
-<!-- Menú de Navegación -->
-<nav>
-    <ul>
-        <li><a href="https://alxund3r777.github.io/portafolio/" target="_blank">Inicio</a></li>
-        <li><a href="######" target="_blank">Contacto</a></li>
-        <li><a href="https://www.emulatorgames.net/roms/" target="_blank">Juegos</a></li>
-    </ul>
-</nav>
+    <div id="top">
+        <h1>Emulador Popular</h1>
+        <img src="https://i.ibb.co/BqbGpLn/pngwing-com.png" alt="Logo" class="logo">
+    </div>
+    <div id="box">
+        <input type="file" id="input" accept=".nes,.sfc,.smc,.gba,.gb,.nds,.pce">
+        <label for="input" style="cursor: pointer; padding: 20px; background-color: #00ff00; color: #800080; border-radius: 8px;">Seleccionar Archivo</label>
+        <p>Pesca la ROM y chántala aquí, mano!</p>
+    </div>
 
-<!-- Contenido Principal -->
-<div id="top">
-    <h1>Emulador Popular</h1>
-    <img src="https://i.ibb.co/BqbGpLn/pngwing-com.png" alt="Logo" class="logo">
-</div>
-<div id="box">
-    <!-- Botón Personalizado para Seleccionar Archivo -->
-    <label for="input" id="selectFileBtn">Seleccionar Archivo</label>
-    <input type="file" id="input">
-    <p>¡Pesca la ROM y chántala aquí, mano!</p>
-</div>
+    <script>
+        document.getElementById('input').addEventListener('change', async function() {
+            const spinner = document.getElementById('spinner');
+            const input = this;
+            spinner.style.display = 'block'; // Mostrar spinner
 
-<script>
-    // JavaScript para cargar y manejar la ROM
-    const spinner = document.getElementById('spinner');
-    const input = document.getElementById('input');
+            const file = input.files[0];
+            const fileExtension = file.name.split('.').pop().toLowerCase();
 
-    input.onchange = async () => {
-        spinner.style.display = 'block'; // Mostrar spinner
+            // Mapea extensiones a núcleos
+            const coreMap = {
+                "fds": "nes",
+                "nes": "nes",
+                "unif": "nes",
+                "unf": "nes",
+                "smc": "snes",
+                "fig": "snes",
+                "sfc": "snes",
+                "gd3": "snes",
+                "gd7": "snes",
+                "dx2": "snes",
+                "bsx": "snes",
+                "swc": "snes",
+                "z64": "n64",
+                "n64": "n64",
+                "pce": "pce",
+                "gba": "gba",
+                "gb": "gb",
+                "nds": "nds"
+            };
 
-        const url = input.files[0];
-        const parts = input.files[0].name.split(".");
-        const core = await (async (ext) => {
-            if (["fds", "nes", "unif", "unf"].includes(ext)) return "nes";
-            if (["smc", "fig", "sfc", "gd3", "gd7", "dx2", "bsx", "swc"].includes(ext)) return "snes";
-            if (["z64", "n64"].includes(ext)) return "n64";
-            if (["pce"].includes(ext)) return "pce";
-            return "generic";
-        })(parts.pop());
+            const core = coreMap[fileExtension] || "generic";
 
-        const div = document.createElement("div");
-        const sub = document.createElement("div");
-        const script = document.createElement("script");
+            // Crear y cargar el script
+            const script = document.createElement('script');
+            script.src = "data/loader.js";
+            script.onload = () => {
+                spinner.style.display = 'none'; // Ocultar spinner
+            };
 
-        sub.id = "game";
-        div.id = "display";
+            // Configuración para el emulador
+            window.EJS_player = "#game";
+            window.EJS_gameName = file.name;
+            window.EJS_gameUrl = URL.createObjectURL(file);
+            window.EJS_core = core;
+            window.EJS_pathtodata = "data/";
+            window.EJS_startOnLoaded = true;
 
-        const top = document.getElementById("top");
-        top.remove();
-        document.body.appendChild(div);
-        div.appendChild(sub);
+            document.body.appendChild(script);
 
-        window.EJS_player = "#game";
-        window.EJS_gameName = parts.shift();
-        window.EJS_core = core;
-        window.EJS_pathtodata = "data/";
-        window.EJS_startOnLoaded = true;
+            // Limpiar el contenedor anterior
+            document.getElementById('top').remove();
+            document.getElementById('box').remove();
 
-        script.src = "data/loader.js";
-        document.body.appendChild(script);
-
-        script.onload = () => {
-            spinner.style.display = 'none'; // Ocultar spinner
-        };
-    };
-</script>
-
+            const div = document.createElement('div');
+            div.id = 'display';
+            document.body.appendChild(div);
+        });
+    </script>
 </body>
 </html>

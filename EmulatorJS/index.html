@@ -45,18 +45,8 @@
             flex-direction: column;
         }
 
-    
-
-      
-
         #input {
-            cursor: pointer;
-            position: center;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 100;
+            display: none; /* Hide the file input */
         }
 
         #display {
@@ -109,6 +99,7 @@
         <img src="https://i.ibb.co/BqbGpLn/pngwing-com.png" alt="Logo" class="logo">
     </div>
     <div id="box">
+        <button id="fileButton">Seleccionar ROM</button>
         <input type="file" id="input">
         Pesca La rom y chantala Aqui mano!!!!
     </div>
@@ -140,6 +131,9 @@
         const spinner = document.getElementById('spinner');
         const input = document.getElementById('input');
         const box = document.getElementById('box');
+        const fileButton = document.getElementById('fileButton');
+
+        fileButton.onclick = () => input.click(); // Trigger file input click
 
         input.onchange = async () => {
             spinner.style.display = 'block'; // Show the spinner
@@ -264,12 +258,13 @@
             document.body.appendChild(script);
 
             script.onload = () => {
-                spinner.style.display = 'none'; // Hide the spinner once the script is loaded
+                window.game = new EJS_game();
+
+                window.game._bootGame = () => {
+                    spinner.style.display = 'none'; // Hide the spinner
+                };
             };
         };
-
-        box.ondragover = () => box.setAttribute("drag", true);
-        box.ondragleave = () => box.removeAttribute("drag");
     </script>
 </body>
 </html>

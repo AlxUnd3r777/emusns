@@ -1,24 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EmulatorJS Demo</title>
     <link rel="icon" href="docs/favicon.ico" sizes="16x16 32x32 48x48 64x64" type="image/vnd.microsoft.icon">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <style>
         #spinner {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            border: 16px solid #fff; /* White border */
-            border-top: 16px solid #ffcc00; /* Mario's yellow cap */
+            border: 16px solid #fff;
+            border-top: 16px solid #ffcc00;
             border-radius: 50%;
             width: 120px;
             height: 120px;
             animation: spin 1.5s linear infinite;
-            z-index: 1000; /* Make sure spinner is on top */
-            display: none; /* Hidden by default */
+            z-index: 1000;
+            display: none;
         }
 
         @keyframes spin {
@@ -28,62 +28,43 @@
 
         body, html {
             height: 100%;
-            background-color: #000; /* Dark background */
-            color: #fff; /* White text */
-        }
-
-        body {
+            background-color: #000;
+            color: #fff;
             margin: 0;
             overflow: hidden;
-            font-family: 'Press Start 2P', cursive; /* Retro game font */
+            font-family: 'Press Start 2P', cursive;
         }
 
-        body, #box, #top {
+        #box {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            flex-direction: column;
+            height: 100vh;
+            text-align: center;
         }
-
-    
-
-      
 
         #input {
-            cursor: pointer;
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
+            display: none; /* Oculta el input de archivo */
         }
 
-        #display {
-            width: 100%;
-            height: 100%;
-        }
-
-        select, button {
-            padding: 0.6em 0.4em;
-            margin: 0.5em;
-            width: 15em;
-            max-width: 100%;
+        label {
+            padding: 0.6em 1.2em;
             font-family: 'Press Start 2P', cursive;
             font-weight: bold;
             font-size: 16px;
-            background-color: #3498db; /* Mario's blue overalls */
+            background-color: #3498db;
             color: #fff;
             border-radius: 0.4em;
-            border: 1px solid #2980b9; /* Darker blue */
+            border: 1px solid #2980b9;
             cursor: pointer;
             transition-duration: 0.2s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Button shadow */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
-        select:hover, button:hover {
-            background-color: #2980b9; /* Darker blue */
-            color: #f1c40f; /* Mario's yellow */
+        label:hover {
+            background-color: #2980b9;
+            color: #f1c40f;
         }
 
         .logo {
@@ -109,8 +90,10 @@
         <img src="https://i.ibb.co/BqbGpLn/pngwing-com.png" alt="Logo" class="logo">
     </div>
     <div id="box">
+        <!-- Etiqueta que actúa como botón de carga -->
+        <label for="input">Pesca la ROM y chántala aquí, mano!</label>
+        <!-- Input de archivo oculto -->
         <input type="file" id="input">
-        Pesca La rom y chantala Aqui mano!!!!
     </div>
 
     <script>
@@ -118,6 +101,7 @@
         let enableThreads = false;
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
+
         if (urlParams.get('debug') == 1) {
             enableDebug = true;
             console.log("Debug is enabled");
@@ -130,7 +114,7 @@
                 enableThreads = true;
                 console.log("Threads are enabled");
             } else {
-                console.warn("Threads are disabled as SharedArrayBuffer is not available. Threads requires two headers to be set when sending your HTML page. See https://stackoverflow.com/a/68630724");
+                console.warn("Threads are disabled as SharedArrayBuffer is not available.");
                 console.log("Threads are disabled");
             }
         } else {
@@ -139,40 +123,30 @@
 
         const spinner = document.getElementById('spinner');
         const input = document.getElementById('input');
-        const box = document.getElementById('box');
 
         input.onchange = async () => {
-            spinner.style.display = 'block'; // Show the spinner
+            spinner.style.display = 'block'; // Mostrar el spinner
 
             const url = input.files[0];
             const parts = input.files[0].name.split(".");
 
             const core = await (async (ext) => {
-                // Determine core type based on file extension
                 if (["fds", "nes", "unif", "unf"].includes(ext))
                     return "nes";
-
                 if (["smc", "fig", "sfc", "gd3", "gd7", "dx2", "bsx", "swc"].includes(ext))
                     return "snes";
-
                 if (["z64", "n64"].includes(ext))
                     return "n64";
-
                 if (["pce"].includes(ext))
                     return "pce";
-
                 if (["ngp", "ngc"].includes(ext))
                     return "ngp";
-
                 if (["ws", "wsc"].includes(ext))
                     return "ws";
-
                 if (["col", "cv"].includes(ext))
                     return "coleco";
-
                 if (["d64"].includes(ext))
                     return "vice_x64sc";
-
                 if (["nds", "gba", "gb", "z64", "n64"].includes(ext))
                     return ext;
 
@@ -221,7 +195,6 @@
 
                     for (const type in cores) {
                         const option = document.createElement("option");
-
                         option.value = cores[type];
                         option.textContent = type;
                         select.appendChild(option);
@@ -245,7 +218,7 @@
 
             const top = document.getElementById("top");
             top.remove();
-            box.remove();
+            document.getElementById('box').remove();
             div.appendChild(sub);
             document.body.appendChild(div);
 
@@ -264,12 +237,9 @@
             document.body.appendChild(script);
 
             script.onload = () => {
-                spinner.style.display = 'none'; // Hide the spinner once the script is loaded
+                spinner.style.display = 'none';
             };
         };
-
-        box.ondragover = () => box.setAttribute("drag", true);
-        box.ondragleave = () => box.removeAttribute("drag");
     </script>
 </body>
 </html>
